@@ -8,7 +8,7 @@ module.exports = (app) => {
   app.use('/books', route);
 
   // Get list of books
-  route.get('/', booksController.getBooks);
+  route.get('/', (req, res, next) => booksController.getBooks(req, res, next));
 
   // Create a new book
   route.post('/', booksController.createBook);

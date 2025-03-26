@@ -8,7 +8,7 @@ module.exports = (app) => {
   app.use('/users', route);
 
   // Get list of users
-  route.get('/', usersController.getUsers);
+  route.get('/', (req, res, next) => usersController.getUsers(req, res, next));
 
   // Create a new user
   route.post('/', usersController.createUser);
@@ -21,6 +21,9 @@ module.exports = (app) => {
 
   // Change password
   route.put('/:id/change-password', usersController.changePassword);
+
+  // Authentication User
+  route.get('/authentication/login', usersController.aunthenticationUser);
 
   // Delete user
   route.delete('/:id', usersController.deleteUser);

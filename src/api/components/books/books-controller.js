@@ -3,11 +3,14 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 
 async function getBooks(request, response, next) {
   try {
-    const books = await booksService.getBooks();
+    const offset = request.query.offset || 25;
+    const limit = request.query.limit || 10;
 
-    return response.status(200).json(books);
+    const books = await booksService.getBooks(offset, limit);
+
+    response.status(200).json(books);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 

@@ -14,7 +14,10 @@ async function getUsers(request, response, next) {
 
 async function getUser(request, response, next) {
   try {
-    const user = await usersService.getUser(request.params.id);
+    const offset = request.query.offset || 0;
+    const limit = request.query.limit || 20;
+
+    const user = await usersService.getUser(request.params.id, offset, limit);
 
     if (!user) {
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
@@ -174,6 +177,38 @@ async function changePassword(request, response, next) {
   return next(errorResponder(errorTypes.NOT_IMPLEMENTED));
 }
 
+async function aunthenticationUser(request, response, next){
+  try {
+    const { email, password } = request.body;
+
+    const user = await usersService.getUserByEmail(email);
+    if (!user) {
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
+    }
+
+    if (email !== user.email || password !== user.password) {
+      throw errorResponder(
+        errorTypes.AUTHENTICATION_ERROR,
+        'Email and Password are not same'
+      );
+    }
+    const success = await usersService.aunthenticationUser(
+      request.params.id,
+      email,
+      password
+    );
+
+    if (!success) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to aunthenticate User'
+      );
+    }
+    return response.status(200).json({ message: 'User authen successfully' });
+  } catch (error) {
+    return next(error);
+  }
+}
 async function deleteUser(request, response, next) {
   try {
     const success = await usersService.deleteUser(request.params.id);
@@ -197,5 +232,6 @@ module.exports = {
   createUser,
   updateUser,
   changePassword,
+  aunthenticationUser,
   deleteUser,
 };
